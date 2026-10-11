@@ -1,0 +1,174 @@
+import { createServer } from "node:http";
+import { readFileSync } from "node:fs";
+import {
+  registerAppResource,
+  registerAppTool,
+  RESOURCE_MIME_TYPE,
+} from "@modelcontextprotocol/ext-apps/server";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { z } from "zod";
+
+const PORT = Number(process.env.PORT || 10000);
+const API_BASE_URL = (process.env.API_BASE_URL || "https://codeforge-api-live.onrender.com").replace(/\/+$/, "");
+const ideHtml = readFileSync(new URL("./public/ide.html", import.meta.url), "utf8");
+
+async function api(path, options = {}) {
+  const response = await fetch(API_BASE_URL + path, {
+    ...options,
+    headers: { "content-type": "application/json", ...(options.headers || {}) },
+    signal: AbortSignal.timeout(25000),
+  });
+  const text = await response.text();
+  let data;
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text || "Invalid API response" }; }
+  if (!response.ok) throw new Error(data.error || ("CodeForge API returned " + response.status));
+  return data;
+}
+
+const problemSchema = z.object({
+  id: z.string(), title: z.string(), difficulty: z.string(),
+  description: z.string(), topics: z.array(z.string()).optional(),
+  examples: z.array(z.any()).optional(), constraints: z.array(z.string()).optional(),
+  starterCode: z.record(z.string()).optional(), sampleInput: z.string().optional(),
+  sampleOutput: z.string().optional()
+});
+const languagesSchema = z.array(z.object({ id: z.number(), name: z.string(), monaco: z.string().optional() }));
+const problemListSchema = z.array(z.object({
+  id: z.string(), title: z.string(), difficulty: z.string(), topics: z.array(z.string()).optional()
+}));
+const reply = (message, structuredContent) => ({
+  content: [{ type: "text", text: message }],
+  structuredContent,
+});
+
+function createCodeForgeServer() {
+  const server = new McpServer({ name: "codeforge-ide", version: "0.1.0" });
+
+  registerAppResource(server, "codeforge-ide", "ui://codeforge/ide.html", {}, async () => ({
+    contents: [{
+      uri: "ui://codeforge/ide.html",
+      mimeType: RESOURCE_MIME_TYPE,
+      text: ideHtml,
+      _meta: {
+        "openai/widgetDescription": "Interactive CodeForge coding IDE with a problem statement, code editor, language selector, execution results, and test submission.",
+        "openai/widgetPrefersBorder": true,
+        "openai/widgetCSP": {
+          connect_domains: [API_BASE_URL],
+          resource_domains: ["https://cdnjs.cloudflare.com"]
+        }
+      }
+    }]
+  }));
+
+  registerAppTool(server, "open_ide", {
+    title: "Open CodeForge IDE",
+    description: "Open the interactive CodeForge coding IDE inside ChatGPT. Select a coding challenge and edit, run, and submit code in the embedded interface.",
+    inputSchema: { problemId: z.string().optional().describe("Challenge ID: two-sum, valid-palindrome, or max-subarray") },
+    outputSchema: { problem: problemSchema, languages: languagesSchema, problems: problemListSchema },
+    _meta: { ui: { resourceUri: "ui://codeforge/ide.html" } }
+  }, async ({ problemId }) => {
+    const [problems, languages] = await Promise.all([api("/api/problems"), api("/api/languages")]);
+    const chosenId = problemId || problems[0]?.id || "two-sum";
+    const problem = await api("/api/problems/" + encodeURIComponent(chosenId));
+    return reply("CodeForge IDE ready. Edit the code in the embedded IDE and run it against the sample input.", { problem, languages, problems });
+  });
+
+  registerAppTool(server, "list_problems", {
+    title: "List CodeForge challenges",
+    description: "List coding challenges available in CodeForge.",
+    inputSchema: {},
+    outputSchema: { problems: problemListSchema }
+  }, async () => {
+    const problems = await api("/api/problems");
+    return reply("Loaded " + problems.length + " CodeForge challenges.", { problems });
+  });
+
+  registerAppTool(server, "get_problem", {
+    title: "Load a CodeForge challenge",
+    description: "Fetch the full problem statement, starter code, sample input, and sample output for a challenge.",
+    inputSchema: { problemId: z.string().min(1) },
+    outputSchema: { problem: problemSchema }
+  }, async ({ problemId }) => {
+    const problem = await api("/api/problems/" + encodeURIComponent(problemId));
+    return reply("Loaded challenge: " + problem.title, { problem });
+  });
+
+  registerAppTool(server, "submit_code", {
+    title: "Run CodeForge code",
+    description: "Execute a user's code through the CodeForge Judge0 backend. Use the exact language ID from the supported languages list.",
+    inputSchema: {
+      problemId: z.string().min(1),
+      languageId: z.number().int().positive(),
+      language: z.string().min(1),
+      sourceCode: z.string().min(1).max(100000),
+      stdin: z.string().max(50000).optional(),
+      expectedOutput: z.string().max(50000).optional()
+    },
+    outputSchema: { submission: z.any() }
+  }, async (args) => {
+    const submission = await api("/api/submissions", {
+      method: "POST",
+      body: JSON.stringify({
+        problemId: args.problemId,
+        languageId: args.languageId,
+        language: args.language,
+        sourceCode: args.sourceCode,
+        stdin: args.stdin || "",
+        expectedOutput: args.expectedOutput || ""
+      })
+    });
+    return reply("Execution finished with verdict: " + (submission.verdict || "Unknown"), { submission });
+  });
+
+  registerAppTool(server, "get_progress", {
+    title: "Get CodeForge progress",
+    description: "Show overall submission count and acceptance rate from CodeForge.",
+    inputSchema: {},
+    outputSchema: { progress: z.any() }
+  }, async () => {
+    const progress = await api("/api/progress");
+    return reply("CodeForge progress loaded.", { progress });
+  });
+
+  return server;
+}
+
+const MCP_PATH = "/mcp";
+const httpServer = createServer(async (req, res) => {
+  if (!req.url) { res.writeHead(400).end("Missing URL"); return; }
+  const url = new URL(req.url, "http://" + (req.headers.host || "localhost"));
+  if (req.method === "GET" && url.pathname === "/") {
+    res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({
+      ok: true, service: "codeforge-chatgpt-ide", mcp: "/mcp", api: API_BASE_URL
+    }));
+    return;
+  }
+  if (req.method === "OPTIONS" && url.pathname === MCP_PATH) {
+    res.writeHead(204, {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, GET, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "content-type, mcp-session-id, mcp-protocol-version",
+      "Access-Control-Expose-Headers": "Mcp-Session-Id"
+    }).end();
+    return;
+  }
+  if (url.pathname === MCP_PATH && req.method && ["POST", "GET", "DELETE"].includes(req.method)) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Expose-Headers", "Mcp-Session-Id");
+    const server = createCodeForgeServer();
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+    res.on("close", () => { transport.close(); server.close(); });
+    try {
+      await server.connect(transport);
+      await transport.handleRequest(req, res);
+    } catch (error) {
+      console.error("MCP request failed:", error);
+      if (!res.headersSent) res.writeHead(500).end("MCP request failed");
+    }
+    return;
+  }
+  res.writeHead(404).end("Not found");
+});
+
+httpServer.listen(PORT, "0.0.0.0", () => console.log("CodeForge ChatGPT IDE MCP listening on " + PORT + MCP_PATH));
