@@ -51,7 +51,7 @@ function createCodeForgeServer() {
       csp: { connectDomains: [API_BASE_URL], resourceDomains: [] },
       prefersBorder: true
     },
-    "openai/widgetDescription": "Interactive CodeForge coding IDE with a problem statement, code editor, language selector, execution results, and test submission.",
+    "openai/widgetDescription": "Minimal responsive CodeForge code editor with a fixed challenge language, stdin, execution results, and solution submission. The challenge statement is shown by ChatGPT in the conversation, not inside this UI.",
     "openai/widgetPrefersBorder": true,
     "openai/widgetCSP": {
       connect_domains: [API_BASE_URL],
@@ -64,7 +64,7 @@ function createCodeForgeServer() {
     "CodeForge IDE",
     resourceUri,
     {
-      description: "Embedded coding challenge IDE for CodeForge.",
+      description: "Minimal responsive embedded code editor. The challenge statement is presented in the ChatGPT conversation, outside this UI.",
       _meta: resourceMeta
     },
     async () => ({
@@ -79,15 +79,24 @@ function createCodeForgeServer() {
 
   registerAppTool(server, "open_ide", {
     title: "Open CodeForge IDE",
-    description: "Open the interactive CodeForge coding IDE inside ChatGPT. Select a coding challenge and edit, run, and submit code in the embedded interface.",
-    inputSchema: { problemId: z.string().optional().describe("Challenge ID: two-sum, valid-palindrome, or max-subarray") },
-    outputSchema: { problem: problemSchema, languages: languagesSchema, problems: problemListSchema },
+    description: "Open the minimal, responsive CodeForge editor inside ChatGPT. The assistant should present the challenge statement in the normal conversation, not inside the IDE. Load only the requested challenge and lock the editor to the requested language; default to C++ if no language is specified.",
+    inputSchema: {
+      problemId: z.string().optional().describe("Challenge ID: two-sum, valid-palindrome, or max-subarray"),
+      language: z.string().optional().describe("Programming language requested by the user; defaults to C++")
+    },
+    outputSchema: { problem: problemSchema, languages: languagesSchema, problems: problemListSchema, selectedLanguage: z.string() },
     _meta: { ui: { resourceUri: "ui://codeforge/ide.html" } }
-  }, async ({ problemId }) => {
+  }, async ({ problemId, language }) => {
     const [problems, languages] = await Promise.all([api("/api/problems"), api("/api/languages")]);
     const chosenId = problemId || problems[0]?.id || "two-sum";
     const problem = await api("/api/problems/" + encodeURIComponent(chosenId));
-    return reply("CodeForge IDE ready. Edit the code in the embedded IDE and run it against the sample input.", { problem, languages, problems });
+    const requestedLanguage = (language || "C++").trim().toLowerCase();
+    const selected = languages.find((item) => item.name.toLowerCase() === requestedLanguage)
+      || languages.find((item) => item.name.toLowerCase().startsWith(requestedLanguage))
+      || languages.find((item) => item.name.toLowerCase().startsWith("c++"))
+      || languages[0];
+    const selectedLanguage = selected?.name || "C++";
+    return reply("CodeForge editor ready for " + problem.title + " in " + selectedLanguage + ". The challenge statement should be presented in the ChatGPT conversation.", { problem, languages, problems, selectedLanguage });
   });
 
   registerAppTool(server, "list_problems", {
