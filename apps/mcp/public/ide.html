@@ -13,36 +13,17 @@
 .workspace{display:flex;flex-direction:column;gap:13px;min-width:0}.codeblock,.result-block{overflow:hidden;border:1px solid var(--cf-line);border-radius:var(--cf-radius);background:var(--cf-code);min-width:0}.code-header{display:flex;align-items:center;gap:8px;min-height:42px;padding:6px 9px 6px 12px;border-bottom:1px solid var(--cf-line)}.code-label{font-size:12px;font-weight:550;color:var(--cf-muted);display:flex;align-items:center;gap:7px}.code-glyph{font:13px/1 var(--font-mono,ui-monospace,monospace);color:var(--cf-fg)}.code-header .spacer,.actions .spacer,.result-head .spacer{flex:1}.code-header select{font-size:12px;padding:5px 8px;border-color:transparent;background:transparent;max-width:170px}.code-header button{font-size:12px;padding:5px 8px;border-color:transparent;background:transparent}textarea#code{display:block;width:100%;height:320px;min-height:220px;resize:vertical;border:0;outline:none;border-radius:0;padding:13px 15px;background:transparent;color:var(--cf-fg);font:13px/1.65 var(--font-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);tab-size:2;white-space:pre;overflow:auto;caret-color:var(--cf-fg);box-shadow:none}textarea#code:focus{outline:none}
 .io-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.field-label{display:block;font-size:13px;font-weight:600;margin:0 0 7px}textarea#stdin{display:block;width:100%;min-height:76px;resize:vertical;border:1px solid var(--cf-line);border-radius:10px;padding:10px 12px;background:var(--cf-bg);color:var(--cf-fg);font:12.5px/1.6 var(--font-mono,ui-monospace,monospace)}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.shortcut{font-size:11px;color:var(--cf-muted)}.result-head{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--cf-line)}.result-title{font-size:12px;font-weight:600}.result{margin:0;min-height:48px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto;font:12.5px/1.6 var(--font-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);color:var(--cf-muted)}.result.good{color:var(--cf-good)}.result.bad{color:var(--cf-bad)}.bottom{font-size:11px;color:var(--cf-muted);line-height:1.5}
 @media(max-width:520px){.shell{gap:17px}.challenge-heading{gap:10px}.topbar{align-items:flex-start}.topbar-controls{width:100%}#problemSelect{max-width:100%;min-width:0;flex:1}textarea#code{height:270px;padding:11px;font-size:12px}.code-header{padding-left:9px}.shortcut{display:none}}
-</style>
-</head>
-<body>
-<div class="shell">
-  <header class="topbar">
-    <span id="connection" class="status">Conectando…</span>
-    <div class="topbar-controls">
-      <label for="problemSelect" class="status">Reto</label>
-      <select id="problemSelect" aria-label="Seleccionar reto"><option value="two-sum">Pair With Target</option></select>
-      <button id="reload" aria-label="Recargar retos">Recargar</button>
-    </div>
-  </header>
-  <section>
-    <div class="challenge-heading"><div>
-      <h1 id="title">Pair With Target</h1>
-      <div class="meta"><span id="difficulty" class="difficulty">Easy</span><span class="meta-dot">·</span><div id="topics" class="topics"></div></div>
-    </div></div>
-    <div class="prose" style="margin-top:15px">
-      <div id="description" class="statement">Cargando reto…</div>
-      <h2 class="section-heading">Ejemplos</h2><div id="examples" class="examples-list"></div>
-      <h2 class="section-heading">Restricciones</h2><ul id="constraints" class="constraints"></ul>
-    </div>
-  </section>
-  <section class="workspace" aria-label="Editor de solución">
-    <div class="codeblock">
-      <div class="code-header"><span class="code-label"><span class="code-glyph">&lt;/&gt;</span> Solución</span><span id="languageHint" hidden></span><span class="spacer"></span><select id="language" aria-label="Lenguaje de programación"></select><button id="reset" type="button">Restaurar</button></div>
-      <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Editor de código" placeholder="// Escribe tu solución aquí"></textarea>
-    </div>
-    <div class="io-grid"><div><label for="stdin" class="field-label">Entrada de prueba (stdin)</label><textarea id="stdin" spellcheck="false" aria-label="Entrada estándar"></textarea></div></div>
-    <div class="actions"><button id="run" class="primary" type="button">▶ Ejecutar</button><button id="submit" type="button">Enviar solución</button><span class="spacer"></span><span class="shortcut">⌘/Ctrl + Enter para ejecutar</span><span id="runStatus" class="status">Listo</span></div>
+
+html,body{min-he<body><div class="shell">
+<header class="topbar"><span class="code-label"><span class="code-glyph">&lt;/&gt;</span> CodeForge</span><span id="connection" class="status">Conectando…</span></header>
+<section class="workspace" aria-label="Editor de solución">
+<div class="codeblock"><div class="code-header"><span class="code-label">Solución</span><span id="languageHint" class="status">C++</span><span class="spacer"></span><button id="reset" type="button">Restaurar</button></div>
+<div class="editor-scroll"><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Editor de código" placeholder="// Escribe tu solución aquí"></textarea></div></div>
+<div class="io-grid"><div><label for="stdin" class="field-label">Entrada de prueba (stdin)</label><textarea id="stdin" spellcheck="false" aria-label="Entrada estándar"></textarea></div></div>
+<div class="actions"><button id="run" class="primary" type="button">▶ Ejecutar</button><button id="submit" type="button">Enviar solución</button><span class="spacer"></span><span class="shortcut">⌘/Ctrl + Enter para ejecutar</span><span id="runStatus" class="status">Listo</span></div>
+<div class="result-block"><div class="result-head"><span class="result-title">Resultado</span><span class="spacer"></span></div><pre id="result" class="result muted">La salida del juez aparecerá aquí.</pre></div>
+</section></div>
+ctions"><button id="run" class="primary" type="button">▶ Ejecutar</button><button id="submit" type="button">Enviar solución</button><span class="spacer"></span><span class="shortcut">⌘/Ctrl + Enter para ejecutar</span><span id="runStatus" class="status">Listo</span></div>
     <div class="result-block"><div class="result-head"><span class="result-title">Resultado</span><span class="spacer"></span></div><pre id="result" class="result muted">La salida del juez aparecerá aquí.</pre></div>
   </section>
   <div class="bottom">CodeForge utiliza el juez remoto conectado. Ejecuta únicamente código que entiendas; la ejecución depende de la disponibilidad del servicio.</div>
@@ -69,35 +50,15 @@ var defaults={
 };
 function setStatus(message,kind){$("runStatus").textContent=message;$("runStatus").className="status"+(kind?" "+kind:"")}
 function setConnection(message,kind){$("connection").textContent=message;$("connection").className="status"+(kind?" "+kind:"")}
-function currentLanguage(){return state.languages.find(function(l){return String(l.id)===$("language").value})||languagesFallback.find(function(l){return String(l.id)===$("language").value})||languagesFallback[5]}
+function currentLanguage(){return state.activeLanguage||languagesFallback.find(function(l){return l.name==="C++"})||languagesFallback[1]}
 function fallbackCode(problem){var lang=currentLanguage().name;if(problem&&problem.starterCode&&problem.starterCode[lang])return problem.starterCode[lang];return templates[lang]||"// Implementa la solución y lee la entrada desde stdin.\n"}
 function setCodeForProblem(){var p=state.problem;if(!p)return;var lang=currentLanguage().name;$("code").value=(p.id==="two-sum"&&templates[lang])?templates[lang]:fallbackCode(p);$("stdin").value=p.sampleInput||defaults[p.id]||"";$("result").textContent="La salida del juez aparecerá aquí.";$("result").className="result muted";setStatus("Listo")}
-function renderProblem(p){
-if(!p)return;
-state.problem=p;
-$("title").textContent=p.title||"Reto";
-$("difficulty").textContent=p.difficulty||"";
-$("description").textContent=p.description||"";
-$("topics").replaceChildren();
-(p.topics||[]).forEach(function(t){var el=document.createElement("span");el.className="topic";el.textContent=t;$("topics").appendChild(el)});
-$("examples").replaceChildren();
-(p.examples||[]).forEach(function(ex,i){
-  var el=document.createElement("div");el.className="example";
-  var label=document.createElement("p");label.className="example-label";label.textContent="Ejemplo "+(i+1);
-  var pre=document.createElement("pre");pre.className="example-code";
-  var code=document.createElement("code");var lines=[];
-  if(ex.input!==undefined)lines.push("Entrada: "+ex.input);
-  if(ex.output!==undefined)lines.push("Salida: "+ex.output);
-  code.textContent=lines.join("\n");pre.appendChild(code);el.appendChild(label);el.appendChild(pre);
-  if(ex.explanation){var explanation=document.createElement("p");explanation.className="example-explanation";explanation.textContent=ex.explanation;el.appendChild(explanation)}
-  $("examples").appendChild(el)
-});
-$("constraints").replaceChildren();
-(p.constraints||[]).forEach(function(c){var el=document.createElement("li");el.textContent=c;$("constraints").appendChild(el)});
-setCodeForProblem()
+function renderProblem(p){if(!p)return;state.problem=p;setCodeForProblem()}
+function fillLanguages(items){
+ state.languages=items&&items.length?items:languagesFallback;
+ state.activeLanguage=state.languages.find(function(l){return l.name==="C++"||l.name.indexOf("C++")===0})||state.languages.find(function(l){return l.name==="TypeScript"})||state.languages[0]||languagesFallback[1];
+ $("languageHint").textContent=state.activeLanguage.name;
 }
-function fillLanguages(items){state.languages=items&&items.length?items:languagesFallback;$("language").replaceChildren();state.languages.forEach(function(l){var o=document.createElement("option");o.value=String(l.id);o.textContent=l.name;$("language").appendChild(o)});$("language").value=String((state.languages.find(function(l){return l.name==="TypeScript"})||state.languages[0]).id);$("languageHint").textContent=currentLanguage().name}
-function fillProblems(items){if(items&&items.length)state.problems=items;$("problemSelect").replaceChildren();state.problems.forEach(function(p){var o=document.createElement("option");o.value=p.id;o.textContent=p.title+" · "+p.difficulty;$("problemSelect").appendChild(o)});if(state.problem)$("problemSelect").value=state.problem.id}
 var rpcId=0,pendingRequests=new Map(),bridgeReady;
 function rpcNotify(method,params){window.parent.postMessage({jsonrpc:"2.0",method:method,params:params||{}}, "*")}
 function rpcRequest(method,params){return new Promise(function(resolve,reject){var id=++rpcId;var timer=setTimeout(function(){pendingRequests.delete(id);reject(new Error("ChatGPT no respondió a "+method+". Comprueba que CodeForge está conectado como una app MCP."))},15000);pendingRequests.set(id,{resolve:function(value){clearTimeout(timer);resolve(value)},reject:function(error){clearTimeout(timer);reject(error)}});window.parent.postMessage({jsonrpc:"2.0",id:id,method:method,params:params||{}}, "*")})}
@@ -106,14 +67,15 @@ window.addEventListener("message",function(event){if(event.source!==window.paren
 async function initializeBridge(){await rpcRequest("ui/initialize",{appInfo:{name:"codeforge-ide",version:"0.2.0"},appCapabilities:{},protocolVersion:"2026-01-26"});rpcNotify("ui/notifications/initialized",{})}
 bridgeReady=initializeBridge();
 async function callTool(name,args){await bridgeReady;var result=await rpcRequest("tools/call",{name:name,arguments:args||{}});if(result&&result.isError){var message=(result.content||[]).filter(function(x){return x.type==="text"}).map(function(x){return x.text}).join("\\n");throw new Error(message||"La herramienta "+name+" ha fallado")}return (result&&result.structuredContent)||(result&&result.result&&result.result.structuredContent)||result||{}}
-async function loadProblem(id){setStatus("Cargando…");try{var data=await callTool("get_problem",{problemId:id});renderProblem(data.problem||data);$("problemSelect").value=id;setStatus("Reto cargado","good")}catch(e){setStatus("No se pudo cargar","bad");$("result").textContent=e.message}}
-async function initialize(){fillLanguages(languagesFallback);try{await bridgeReady;var data=await callTool("list_problems",{});fillProblems(data.problems||[]);if(state.problems.length)await loadProblem(state.problems[0].id);setConnection("API conectada","good")}catch(e){setConnection("Sin conexión con ChatGPT","bad");renderProblem({id:"two-sum",title:"Pair With Target",difficulty:"Easy",description:"Dado un array de enteros y un objetivo, devuelve los índices de dos valores que sumen el objetivo.",topics:["Array","Hash Map"],examples:[{input:"nums = [2,7,11,15], target = 9",output:"[0,1]"}],constraints:["Una única solución existe."],sampleInput:defaults["two-sum"]});$("result").textContent=e.message}}async function execute(submit){if(state.busy)return;var p=state.problem;if(!p){setStatus("Carga un reto primero","bad");return}var lang=currentLanguage();state.busy=true;$("run").disabled=true;$("submit").disabled=true;setStatus(submit?"Enviando…":"Ejecutando…");$("result").textContent="El juez está ejecutando el código…";try{var data=await callTool("submit_code",{problemId:p.id,languageId:lang.id,language:lang.name,sourceCode:$("code").value,stdin:$("stdin").value,expectedOutput:p.sampleOutput||""});var s=data.submission||data;var verdict=s.verdict||"Resultado recibido";var detail=["Veredicto: "+verdict];if(s.stdout)detail.push("stdout:\n"+s.stdout);if(s.stderr)detail.push("stderr:\n"+s.stderr);if(s.compileOutput)detail.push("Compilación:\n"+s.compileOutput);if(s.time)detail.push("Tiempo: "+s.time+" s");if(s.memory)detail.push("Memoria: "+s.memory+" KB");$("result").textContent=detail.join("\n\n");var good=verdict==="Accepted";$("result").className="result "+(good?"good":(verdict==="Wrong Answer"||verdict==="Compilation Error"||verdict==="Runtime Error"?"bad":""));setStatus(verdict,good?"good":"bad")}catch(e){$("result").textContent=e.message;setStatus("Error al ejecutar","bad")}finally{state.busy=false;$("run").disabled=false;$("submit").disabled=false}}
-$("problemSelect").addEventListener("change",function(){loadProblem(this.value)});
-$("language").addEventListener("change",function(){$("languageHint").textContent=currentLanguage().name;setCodeForProblem()});
+async function initialize(){
+ fillLanguages(languagesFallback);
+ try{await bridgeReady;setConnection("IDE conectado","good")}
+ catch(e){setConnection("Sin conexión con ChatGPT","bad");$("result").textContent=e.message}
+}
+async function execute(submit){if(state.busy)return;var p=state.problem;if(!p){setStatus("Carga un reto primero","bad");return}var lang=currentLanguage();state.busy=true;$("run").disabled=true;$("submit").disabled=true;setStatus(submit?"Enviando…":"Ejecutando…");$("result").textContent="El juez está ejecutando el código…";try{var data=await callTool("submit_code",{problemId:p.id,languageId:lang.id,language:lang.name,sourceCode:$("code").value,stdin:$("stdin").value,expectedOutput:p.sampleOutput||""});var s=data.submission||data;var verdict=s.verdict||"Resultado recibido";var detail=["Veredicto: "+verdict];if(s.stdout)detail.push("stdout:\n"+s.stdout);if(s.stderr)detail.push("stderr:\n"+s.stderr);if(s.compileOutput)detail.push("Compilación:\n"+s.compileOutput);if(s.time)detail.push("Tiempo: "+s.time+" s");if(s.memory)detail.push("Memoria: "+s.memory+" KB");$("result").textContent=detail.join("\n\n");var good=verdict==="Accepted";$("result").className="result "+(good?"good":(verdict==="Wrong Answer"||verdict==="Compilation Error"||verdict==="Runtime Error"?"bad":""));setStatus(verdict,good?"good":"bad")}catch(e){$("result").textContent=e.message;setStatus("Error al ejecutar","bad")}finally{state.busy=false;$("run").disabled=false;$("submit").disabled=false}}
 $("run").addEventListener("click",function(){execute(false)});
 $("submit").addEventListener("click",function(){execute(true)});
 $("reset").addEventListener("click",setCodeForProblem);
-$("reload").addEventListener("click",initialize);
 document.addEventListener("keydown",function(e){if((e.metaKey||e.ctrlKey)&&e.key==="Enter"){e.preventDefault();execute(false)}});
 initialize();
 })();
