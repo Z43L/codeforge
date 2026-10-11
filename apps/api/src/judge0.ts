@@ -10,7 +10,7 @@ export type JudgeResult = {
   status: { id: number; description: string };
 };
 
-export async function execute(sourceCode: string, languageId: number, stdin: string): Promise<{
+export async function execute(sourceCode: string, languageId: number, stdin: string, expectedOutput = ""): Promise<{
   verdict: Verdict; stdout: string; stderr: string; compileOutput: string;
   time: string | null; memory: number | null;
 }> {
@@ -22,7 +22,7 @@ export async function execute(sourceCode: string, languageId: number, stdin: str
   if (TOKEN) headers["X-Auth-Token"] = TOKEN;
   const response = await fetch(url, {
     method: "POST", headers,
-    body: JSON.stringify({ source_code: sourceCode, language_id: languageId, stdin, cpu_time_limit: 2, wall_time_limit: 5, memory_limit: 128000 })
+    body: JSON.stringify({ source_code: sourceCode, language_id: languageId, stdin, ...(expectedOutput ? { expected_output: expectedOutput } : {}), cpu_time_limit: 2, wall_time_limit: 5, memory_limit: 128000 })
   });
   if (!response.ok) throw new Error(`Execution service returned HTTP ${response.status}.`);
   let data = await response.json() as JudgeResult & { token?: string };
