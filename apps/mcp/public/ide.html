@@ -5,35 +5,47 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CodeForge IDE</title>
 <style>
-:root{color-scheme:light dark;--bg:var(--color-background-primary,#fff);--panel:var(--color-background-secondary,#f5f5f5);--fg:var(--color-text-primary,#171717);--muted:var(--color-text-secondary,#6b7280);--line:var(--color-border,#ddd);--accent:#6750a4;--good:#16804a;--bad:#c0392b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,sans-serif}button,select,textarea{font:inherit}button,select{border:1px solid var(--line);border-radius:9px;padding:8px 11px;background:var(--bg);color:var(--fg)}button{cursor:pointer}button.primary{background:var(--accent);color:white;border-color:transparent;font-weight:650}button:disabled{opacity:.5;cursor:wait}.shell{display:grid;gap:12px;padding:12px}.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.brand{font-size:17px;font-weight:800;letter-spacing:-.4px}.brand span{color:var(--accent)}.spacer{flex:1}.layout{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(300px,1.2fr);gap:12px}.panel{border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}.panel-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--panel);border-bottom:1px solid var(--line);font-weight:700}.panel-body{padding:12px}.muted{color:var(--muted)}.difficulty{font-size:11px;border-radius:20px;padding:3px 8px;background:var(--panel);border:1px solid var(--line)}h2{font-size:18px;margin:0 0 8px}h3{font-size:13px;margin:14px 0 6px}.statement{white-space:pre-wrap}.example{background:var(--panel);padding:9px;border-radius:8px;margin:7px 0;font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap}.editor-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px;border-bottom:1px solid var(--line)}select{max-width:100%}textarea#code{display:block;width:100%;height:300px;resize:vertical;border:0;outline:none;border-radius:0;padding:13px;background:#171923;color:#e5e7eb;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:2;white-space:pre;overflow:auto}textarea#stdin{width:100%;min-height:72px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:9px;background:var(--bg);color:var(--fg);font:12px/1.5 ui-monospace,monospace}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;border-top:1px solid var(--line)}.result{min-height:62px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 ui-monospace,monospace}.status{font-size:12px;color:var(--muted)}.status.good{color:var(--good)}.status.bad{color:var(--bad)}.topics{display:flex;gap:5px;flex-wrap:wrap}.topic{font-size:11px;border:1px solid var(--line);padding:2px 7px;border-radius:99px;color:var(--muted)}.bottom{font-size:11px;color:var(--muted)}@media(max-width:650px){.layout{grid-template-columns:1fr}.shell{padding:8px}textarea#code{height:260px}}
+:root{color-scheme:light dark;--cf-bg:var(--color-background-primary,transparent);--cf-surface:var(--color-background-secondary,#f7f7f8);--cf-fg:var(--color-text-primary,#171717);--cf-muted:var(--color-text-secondary,#6b7280);--cf-line:var(--color-border,#dedede);--cf-good:var(--color-text-success,#16804a);--cf-bad:var(--color-text-danger,#c0392b);--cf-code:var(--color-background-secondary,#f7f7f8);--cf-radius:12px}
+*{box-sizing:border-box}body{margin:0;background:var(--cf-bg);color:var(--cf-fg);font:14px/1.65 var(--font-sans,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif)}button,select,textarea{font:inherit}button,select{border:1px solid var(--cf-line);border-radius:9px;padding:7px 10px;background:var(--cf-bg);color:var(--cf-fg)}button{cursor:pointer;transition:background .12s ease}button:hover:not(:disabled){background:var(--cf-surface)}button.primary{background:var(--cf-fg);color:var(--cf-bg);border-color:transparent;font-weight:600}button.primary:hover:not(:disabled){opacity:.88}button:disabled{opacity:.5;cursor:wait}
+.shell{display:flex;flex-direction:column;gap:20px;padding:2px 0 8px;max-width:100%;min-width:0}.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.topbar-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.status{font-size:12px;color:var(--cf-muted);line-height:1.4}.status.good{color:var(--cf-good)}.status.bad{color:var(--cf-bad)}
+.challenge-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}h1{font-size:clamp(21px,3vw,27px);line-height:1.25;letter-spacing:-.55px;font-weight:650;margin:0}.meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}.difficulty,.meta-dot{font-size:12px;color:var(--cf-muted)}.topics{display:inline-flex;gap:6px;flex-wrap:wrap}.topic{font-size:12px;color:var(--cf-muted)}.topic:not(:last-child)::after{content:"·";margin-left:6px;color:var(--cf-muted)}
+.prose{min-width:0;color:var(--cf-fg);font-size:14px;line-height:1.75}.statement{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}.section-heading{font-size:16px;line-height:1.4;font-weight:600;letter-spacing:-.15px;margin:19px 0 9px}.examples-list{display:flex;flex-direction:column;gap:12px}.example{margin:0;min-width:0}.example-label{font-size:13px;font-weight:600;margin:0 0 6px}.example-code{display:block;margin:0;padding:11px 13px;border:1px solid var(--cf-line);border-radius:var(--cf-radius);background:var(--cf-code);color:var(--cf-fg);font:12.5px/1.6 var(--font-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto}.example-explanation{margin:7px 0 0;color:var(--cf-muted)}.constraints{margin:0;padding-left:22px;line-height:1.7}.constraints li{padding-left:2px}
+.workspace{display:flex;flex-direction:column;gap:13px;min-width:0}.codeblock,.result-block{overflow:hidden;border:1px solid var(--cf-line);border-radius:var(--cf-radius);background:var(--cf-code);min-width:0}.code-header{display:flex;align-items:center;gap:8px;min-height:42px;padding:6px 9px 6px 12px;border-bottom:1px solid var(--cf-line)}.code-label{font-size:12px;font-weight:550;color:var(--cf-muted);display:flex;align-items:center;gap:7px}.code-glyph{font:13px/1 var(--font-mono,ui-monospace,monospace);color:var(--cf-fg)}.code-header .spacer,.actions .spacer,.result-head .spacer{flex:1}.code-header select{font-size:12px;padding:5px 8px;border-color:transparent;background:transparent;max-width:170px}.code-header button{font-size:12px;padding:5px 8px;border-color:transparent;background:transparent}textarea#code{display:block;width:100%;height:320px;min-height:220px;resize:vertical;border:0;outline:none;border-radius:0;padding:13px 15px;background:transparent;color:var(--cf-fg);font:13px/1.65 var(--font-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);tab-size:2;white-space:pre;overflow:auto;caret-color:var(--cf-fg);box-shadow:none}textarea#code:focus{outline:none}
+.io-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.field-label{display:block;font-size:13px;font-weight:600;margin:0 0 7px}textarea#stdin{display:block;width:100%;min-height:76px;resize:vertical;border:1px solid var(--cf-line);border-radius:10px;padding:10px 12px;background:var(--cf-bg);color:var(--cf-fg);font:12.5px/1.6 var(--font-mono,ui-monospace,monospace)}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.shortcut{font-size:11px;color:var(--cf-muted)}.result-head{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--cf-line)}.result-title{font-size:12px;font-weight:600}.result{margin:0;min-height:48px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto;font:12.5px/1.6 var(--font-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);color:var(--cf-muted)}.result.good{color:var(--cf-good)}.result.bad{color:var(--cf-bad)}.bottom{font-size:11px;color:var(--cf-muted);line-height:1.5}
+@media(max-width:520px){.shell{gap:17px}.challenge-heading{gap:10px}.topbar{align-items:flex-start}.topbar-controls{width:100%}#problemSelect{max-width:100%;min-width:0;flex:1}textarea#code{height:270px;padding:11px;font-size:12px}.code-header{padding-left:9px}.shortcut{display:none}}
 </style>
 </head>
 <body>
 <div class="shell">
-  <header class="top"><div class="brand"><span>◆</span> CodeForge <span style="color:var(--fg)">IDE</span></div><div class="spacer"></div><span id="connection" class="status">Conectando…</span></header>
-  <div class="top"><label for="problemSelect" class="muted">Reto</label><select id="problemSelect" aria-label="Seleccionar reto"><option value="two-sum">Pair With Target</option></select><button id="reload">Recargar</button></div>
-  <main class="layout">
-    <section class="panel">
-      <div class="panel-head">Enunciado <span class="spacer"></span><span id="difficulty" class="difficulty">Easy</span></div>
-      <div class="panel-body">
-        <h2 id="title">Pair With Target</h2>
-        <div id="topics" class="topics"></div>
-        <p id="description" class="statement">Cargando reto…</p>
-        <h3>Ejemplos</h3><div id="examples"></div>
-        <h3>Restricciones</h3><ul id="constraints"></ul>
-      </div>
-    </section>
-    <section class="panel">
-      <div class="panel-head">Editor de código <span class="spacer"></span><span id="languageHint" class="muted">TypeScript</span></div>
-      <div class="editor-toolbar"><label for="language">Lenguaje</label><select id="language"></select><button id="reset">Restaurar plantilla</button></div>
+  <header class="topbar">
+    <span id="connection" class="status">Conectando…</span>
+    <div class="topbar-controls">
+      <label for="problemSelect" class="status">Reto</label>
+      <select id="problemSelect" aria-label="Seleccionar reto"><option value="two-sum">Pair With Target</option></select>
+      <button id="reload" aria-label="Recargar retos">Recargar</button>
+    </div>
+  </header>
+  <section>
+    <div class="challenge-heading"><div>
+      <h1 id="title">Pair With Target</h1>
+      <div class="meta"><span id="difficulty" class="difficulty">Easy</span><span class="meta-dot">·</span><div id="topics" class="topics"></div></div>
+    </div></div>
+    <div class="prose" style="margin-top:15px">
+      <div id="description" class="statement">Cargando reto…</div>
+      <h2 class="section-heading">Ejemplos</h2><div id="examples" class="examples-list"></div>
+      <h2 class="section-heading">Restricciones</h2><ul id="constraints" class="constraints"></ul>
+    </div>
+  </section>
+  <section class="workspace" aria-label="Editor de solución">
+    <div class="codeblock">
+      <div class="code-header"><span class="code-label"><span class="code-glyph">&lt;/&gt;</span> Solución</span><span class="spacer"></span><select id="language" aria-label="Lenguaje de programación"></select><button id="reset" type="button">Restaurar</button></div>
       <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Editor de código" placeholder="// Escribe tu solución aquí"></textarea>
-      <div class="panel-body"><h3 style="margin-top:0">Entrada estándar (stdin)</h3><textarea id="stdin" spellcheck="false"></textarea></div>
-      <div class="actions"><button id="run" class="primary">▶ Ejecutar</button><button id="submit" >Enviar solución</button><span class="spacer"></span><span id="runStatus" class="status">Listo</span></div>
-      <div class="panel-body"><h3 style="margin-top:0">Resultado</h3><div id="result" class="result muted">La salida del juez aparecerá aquí.</div></div>
-    </section>
-  </main>
-  <div class="bottom">CodeForge usa el juez remoto de la API conectada. No ejecutes código que no entiendas. El progreso depende de la disponibilidad del servicio de ejecución.</div>
+    </div>
+    <div class="io-grid"><div><label for="stdin" class="field-label">Entrada de prueba (stdin)</label><textarea id="stdin" spellcheck="false" aria-label="Entrada estándar"></textarea></div></div>
+    <div class="actions"><button id="run" class="primary" type="button">▶ Ejecutar</button><button id="submit" type="button">Enviar solución</button><span class="spacer"></span><span class="shortcut">⌘/Ctrl + Enter para ejecutar</span><span id="runStatus" class="status">Listo</span></div>
+    <div class="result-block"><div class="result-head"><span class="result-title">Resultado</span><span class="spacer"></span></div><pre id="result" class="result muted">La salida del juez aparecerá aquí.</pre></div>
+  </section>
+  <div class="bottom">CodeForge utiliza el juez remoto conectado. Ejecuta únicamente código que entiendas; la ejecución depende de la disponibilidad del servicio.</div>
 </div>
 <script>
 (function(){
@@ -60,7 +72,30 @@ function setConnection(message,kind){$("connection").textContent=message;$("conn
 function currentLanguage(){return state.languages.find(function(l){return String(l.id)===$("language").value})||languagesFallback.find(function(l){return String(l.id)===$("language").value})||languagesFallback[5]}
 function fallbackCode(problem){var lang=currentLanguage().name;if(problem&&problem.starterCode&&problem.starterCode[lang])return problem.starterCode[lang];return templates[lang]||"// Implementa la solución y lee la entrada desde stdin.\n"}
 function setCodeForProblem(){var p=state.problem;if(!p)return;var lang=currentLanguage().name;$("code").value=(p.id==="two-sum"&&templates[lang])?templates[lang]:fallbackCode(p);$("stdin").value=p.sampleInput||defaults[p.id]||"";$("result").textContent="La salida del juez aparecerá aquí.";$("result").className="result muted";setStatus("Listo")}
-function renderProblem(p){if(!p)return;state.problem=p;$("title").textContent=p.title;$("difficulty").textContent=p.difficulty;$("description").textContent=p.description;$("topics").replaceChildren();(p.topics||[]).forEach(function(t){var el=document.createElement("span");el.className="topic";el.textContent=t;$("topics").appendChild(el)});$("examples").replaceChildren();(p.examples||[]).forEach(function(ex,i){var el=document.createElement("div");el.className="example";el.textContent="Ejemplo "+(i+1)+"\nEntrada: "+ex.input+"\nSalida: "+ex.output+(ex.explanation?"\n"+ex.explanation:"");$("examples").appendChild(el)});$("constraints").replaceChildren();(p.constraints||[]).forEach(function(c){var el=document.createElement("li");el.textContent=c;$("constraints").appendChild(el)});setCodeForProblem()}
+function renderProblem(p){
+if(!p)return;
+state.problem=p;
+$("title").textContent=p.title||"Reto";
+$("difficulty").textContent=p.difficulty||"";
+$("description").textContent=p.description||"";
+$("topics").replaceChildren();
+(p.topics||[]).forEach(function(t){var el=document.createElement("span");el.className="topic";el.textContent=t;$("topics").appendChild(el)});
+$("examples").replaceChildren();
+(p.examples||[]).forEach(function(ex,i){
+  var el=document.createElement("div");el.className="example";
+  var label=document.createElement("p");label.className="example-label";label.textContent="Ejemplo "+(i+1);
+  var pre=document.createElement("pre");pre.className="example-code";
+  var code=document.createElement("code");var lines=[];
+  if(ex.input!==undefined)lines.push("Entrada: "+ex.input);
+  if(ex.output!==undefined)lines.push("Salida: "+ex.output);
+  code.textContent=lines.join("\\n");pre.appendChild(code);el.appendChild(label);el.appendChild(pre);
+  if(ex.explanation){var explanation=document.createElement("p");explanation.className="example-explanation";explanation.textContent=ex.explanation;el.appendChild(explanation)}
+  $("examples").appendChild(el)
+});
+$("constraints").replaceChildren();
+(p.constraints||[]).forEach(function(c){var el=document.createElement("li");el.textContent=c;$("constraints").appendChild(el)});
+setCodeForProblem()
+}
 function fillLanguages(items){state.languages=items&&items.length?items:languagesFallback;$("language").replaceChildren();state.languages.forEach(function(l){var o=document.createElement("option");o.value=String(l.id);o.textContent=l.name;$("language").appendChild(o)});$("language").value=String((state.languages.find(function(l){return l.name==="TypeScript"})||state.languages[0]).id);$("languageHint").textContent=currentLanguage().name}
 function fillProblems(items){if(items&&items.length)state.problems=items;$("problemSelect").replaceChildren();state.problems.forEach(function(p){var o=document.createElement("option");o.value=p.id;o.textContent=p.title+" · "+p.difficulty;$("problemSelect").appendChild(o)});if(state.problem)$("problemSelect").value=state.problem.id}
 var rpcId=0,pendingRequests=new Map(),bridgeReady;
