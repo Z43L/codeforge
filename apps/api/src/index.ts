@@ -15,6 +15,23 @@ app.use(cors({ origin: (origin, callback) => {
   return callback(new Error("Origin not allowed by CORS"));
 }}));
 app.use(express.json({ limit: "256kb" }));
+app.set("trust proxy", 1);
+const submissionWindows = new Map<string, { count: number; resetAt: number }>();
+function submissionRateLimit(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const now = Date.now();
+  const key = req.ip || "unknown";
+  let bucket = submissionWindows.get(key);
+  if (!bucket || bucket.resetAt <= now) {
+    bucket = { count: 0, resetAt: now + 60_000 };
+    submissionWindows.set(key, bucket);
+  }
+  if (bucket.count >= 10) return res.status(429).json({ error: "Rate limit reached. Try again in a minute." });
+  bucket.count += 1;
+  if (submissionWindows.size > 1000) {
+    for (const [ip, value] of submissionWindows) if (value.resetAt <= now) submissionWindows.delete(ip);
+  }
+  return next();
+}
 
 app.get("/", (_req, res) => res.json({ service: "CodeForge API", health: "/api/health" }));
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "codeforge-api", version: "0.2.0", executionConfigured: Boolean(process.env.JUDGE0_BASE_URL) }));
@@ -45,7 +62,7 @@ const submissionSchema = z.object({
   stdin: z.string().max(50_000).default(""),
   expectedOutput: z.string().max(50_000).optional()
 });
-app.post("/api/submissions", async (req, res) => {
+app.post("/api/submissions", submissionRateLimit, async (req, res) => {
   const parsed = submissionSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "Invalid submission", details: parsed.error.flatten() });
   if (!PROBLEMS.some(p => p.id === parsed.data.problemId)) return res.status(404).json({ error: "Problem not found" });
