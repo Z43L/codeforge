@@ -45,21 +45,37 @@ const reply = (message, structuredContent) => ({
 function createCodeForgeServer() {
   const server = new McpServer({ name: "codeforge-ide", version: "0.1.0" });
 
-  registerAppResource(server, "codeforge-ide", "ui://codeforge/ide.html", {}, async () => ({
-    contents: [{
-      uri: "ui://codeforge/ide.html",
-      mimeType: RESOURCE_MIME_TYPE,
-      text: ideHtml,
-      _meta: {
-        "openai/widgetDescription": "Interactive CodeForge coding IDE with a problem statement, code editor, language selector, execution results, and test submission.",
-        "openai/widgetPrefersBorder": true,
-        "openai/widgetCSP": {
-          connect_domains: [API_BASE_URL],
-          resource_domains: ["https://cdnjs.cloudflare.com"]
-        }
-      }
-    }]
-  }));
+  const resourceUri = "ui://codeforge/ide.html";
+  const resourceMeta = {
+    ui: {
+      csp: { connectDomains: [API_BASE_URL], resourceDomains: [] },
+      prefersBorder: true
+    },
+    "openai/widgetDescription": "Interactive CodeForge coding IDE with a problem statement, code editor, language selector, execution results, and test submission.",
+    "openai/widgetPrefersBorder": true,
+    "openai/widgetCSP": {
+      connect_domains: [API_BASE_URL],
+      resource_domains: []
+    }
+  };
+
+  registerAppResource(
+    server,
+    "CodeForge IDE",
+    resourceUri,
+    {
+      description: "Embedded coding challenge IDE for CodeForge.",
+      _meta: resourceMeta
+    },
+    async () => ({
+      contents: [{
+        uri: resourceUri,
+        mimeType: RESOURCE_MIME_TYPE,
+        text: ideHtml,
+        _meta: resourceMeta
+      }]
+    })
+  );
 
   registerAppTool(server, "open_ide", {
     title: "Open CodeForge IDE",
