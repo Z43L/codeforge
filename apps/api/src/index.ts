@@ -42,7 +42,8 @@ const submissionSchema = z.object({
   languageId: z.number().int().positive(),
   language: z.string().min(1).max(40),
   sourceCode: z.string().min(1).max(100_000),
-  stdin: z.string().max(50_000).default("")
+  stdin: z.string().max(50_000).default(""),
+  expectedOutput: z.string().max(50_000).optional()
 });
 app.post("/api/submissions", async (req, res) => {
   const parsed = submissionSchema.safeParse(req.body);
@@ -53,7 +54,7 @@ app.post("/api/submissions", async (req, res) => {
   const id = randomUUID();
   const createdAt = new Date().toISOString();
   try {
-    const result = await execute(parsed.data.sourceCode, parsed.data.languageId, parsed.data.stdin);
+    const result = await execute(parsed.data.sourceCode, parsed.data.languageId, parsed.data.stdin, parsed.data.expectedOutput ?? "");
     db.prepare(`INSERT INTO submissions
       (id, problem_id, language_id, language, source_code, stdin, stdout, stderr, compile_output, verdict, time, memory, created_at)
       VALUES (@id,@problemId,@languageId,@language,@sourceCode,@stdin,@stdout,@stderr,@compileOutput,@verdict,@time,@memory,@createdAt)`).run({
