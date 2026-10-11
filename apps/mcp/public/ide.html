@@ -88,7 +88,7 @@ $("examples").replaceChildren();
   var code=document.createElement("code");var lines=[];
   if(ex.input!==undefined)lines.push("Entrada: "+ex.input);
   if(ex.output!==undefined)lines.push("Salida: "+ex.output);
-  code.textContent=lines.join("\\n");pre.appendChild(code);el.appendChild(label);el.appendChild(pre);
+  code.textContent=lines.join("\n");pre.appendChild(code);el.appendChild(label);el.appendChild(pre);
   if(ex.explanation){var explanation=document.createElement("p");explanation.className="example-explanation";explanation.textContent=ex.explanation;el.appendChild(explanation)}
   $("examples").appendChild(el)
 });
