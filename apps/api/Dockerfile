@@ -1,11 +1,10 @@
 FROM node:22-alpine
 RUN apk add --no-cache python3 make g++
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install --omit=dev
+COPY package.json ./
+RUN npm install
 COPY tsconfig.json ./
 COPY src ./src
-RUN npm install --no-save typescript @types/node @types/express @types/cors @types/better-sqlite3
 RUN npm run build
 ENV NODE_ENV=production
 ENV PORT=10000
