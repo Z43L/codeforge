@@ -94,7 +94,8 @@ function createCodeForgeServer() {
     title: "List CodeForge challenges",
     description: "List coding challenges available in CodeForge.",
     inputSchema: {},
-    outputSchema: { problems: problemListSchema }
+    outputSchema: { problems: problemListSchema },
+    _meta: {}
   }, async () => {
     const problems = await api("/api/problems");
     return reply("Loaded " + problems.length + " CodeForge challenges.", { problems });
@@ -104,7 +105,8 @@ function createCodeForgeServer() {
     title: "Load a CodeForge challenge",
     description: "Fetch the full problem statement, starter code, sample input, and sample output for a challenge.",
     inputSchema: { problemId: z.string().min(1) },
-    outputSchema: { problem: problemSchema }
+    outputSchema: { problem: problemSchema },
+    _meta: {}
   }, async ({ problemId }) => {
     const problem = await api("/api/problems/" + encodeURIComponent(problemId));
     return reply("Loaded challenge: " + problem.title, { problem });
@@ -121,7 +123,8 @@ function createCodeForgeServer() {
       stdin: z.string().max(50000).optional(),
       expectedOutput: z.string().max(50000).optional()
     },
-    outputSchema: { submission: z.any() }
+    outputSchema: { submission: z.any() },
+    _meta: {}
   }, async (args) => {
     const submission = await api("/api/submissions", {
       method: "POST",
@@ -141,7 +144,8 @@ function createCodeForgeServer() {
     title: "Get CodeForge progress",
     description: "Show overall submission count and acceptance rate from CodeForge.",
     inputSchema: {},
-    outputSchema: { progress: z.any() }
+    outputSchema: { progress: z.any() },
+    _meta: {}
   }, async () => {
     const progress = await api("/api/progress");
     return reply("CodeForge progress loaded.", { progress });
