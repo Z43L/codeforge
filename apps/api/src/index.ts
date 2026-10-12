@@ -65,7 +65,7 @@ const submissionSchema = z.object({
 app.post("/api/submissions", submissionRateLimit, async (req, res) => {
   const parsed = submissionSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "Invalid submission", details: parsed.error.flatten() });
-  if (!PROBLEMS.some(p => p.id === parsed.data.problemId)) return res.status(404).json({ error: "Problem not found" });
+  if (!PROBLEMS.some(p => p.id === parsed.data.problemId) && parsed.data.problemId !== "custom" && !parsed.data.problemId.startsWith("custom-")) return res.status(404).json({ error: "Problem not found" });
   const language = LANGUAGES.find(l => l.id === parsed.data.languageId);
   if (!language) return res.status(400).json({ error: "Unsupported language ID" });
   const id = randomUUID();
