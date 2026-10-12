@@ -88,8 +88,10 @@ function createCodeForgeServer() {
     _meta: { ui: { resourceUri: "ui://codeforge/ide.html" } }
   }, async ({ problemId, language }) => {
     const [problems, languages] = await Promise.all([api("/api/problems"), api("/api/languages")]);
-    const chosenId = problemId || problems[0]?.id || "two-sum";
-    const problem = await api("/api/problems/" + encodeURIComponent(chosenId));
+    // Do not silently load the first catalog challenge (historically Two Sum) when no challenge was requested.
+    const problem = problemId
+      ? await api("/api/problems/" + encodeURIComponent(problemId))
+      : { id: "custom", title: "Custom workspace", difficulty: "—", description: "", topics: [], examples: [], constraints: [], starterCode: {}, sampleInput: "", sampleOutput: "" };
     const requestedLanguage = (language || "C++").trim().toLowerCase();
     const selected = languages.find((item) => item.name.toLowerCase() === requestedLanguage)
       || languages.find((item) => item.name.toLowerCase().startsWith(requestedLanguage))
