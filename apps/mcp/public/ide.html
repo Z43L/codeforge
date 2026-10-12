@@ -264,6 +264,14 @@ pre#result.bad { color: var(--terminal-red); }
     if (result.stdout) lines.push("stdout:\n" + result.stdout);
     if (result.stderr) lines.push("stderr:\n" + result.stderr);
     if (result.compileOutput) lines.push("Compilación:\n" + result.compileOutput);
+    if (Array.isArray(result.tests)) {
+      lines.push("Tests superados: " + (result.passedTests || 0) + "/" + (result.totalTests || result.tests.length));
+      result.tests.forEach(function (test, index) {
+        lines.push((test.passed ? "✓ " : "✗ ") + (test.name || ("Test " + (index + 1))) + ": " + (test.verdict || "sin veredicto"));
+        if (test.stderr) lines.push("stderr: " + test.stderr);
+        if (test.compileOutput) lines.push("compilación: " + test.compileOutput);
+      });
+    }
     if (result.time) lines.push("Tiempo: " + result.time + " s");
     if (result.memory) lines.push("Memoria: " + result.memory + " KB");
     $("result").textContent = lines.join("\n\n");
@@ -333,7 +341,7 @@ pre#result.bad { color: var(--terminal-red); }
     }
     return normalizeData(response) || {};
   }
-  async function execute() {
+  async function execute(submitAll) {
     if (state.busy) return;
     if (!state.problem) {
       setStatus("Esperando el reto desde ChatGPT", "bad");
@@ -343,7 +351,7 @@ pre#result.bad { color: var(--terminal-red); }
     state.busy = true;
     $("run").disabled = true;
     $("submit").disabled = true;
-    setStatus("Ejecutando…");
+    setStatus(submitAll ? "Ejecutando todos los tests…" : "Ejecutando…");
     $("result").textContent = "El juez está ejecutando el código…";
     $("result").className = "";
     try {
@@ -353,7 +361,8 @@ pre#result.bad { color: var(--terminal-red); }
         language: lang.name,
         sourceCode: $("code").value,
         stdin: $("stdin").value || "",
-        expectedOutput: state.problem.sampleOutput || ""
+        expectedOutput: state.problem.sampleOutput || "",
+        testCases: submitAll ? (state.problem.tests || []).map(function (test, index) { return { name: test.name || ("Test " + (index + 1)), stdin: test.stdin, expectedOutput: test.expectedOutput }; }) : undefined
       });
       renderSubmission(data.submission || data);
     } catch (error) {
@@ -391,8 +400,16 @@ pre#result.bad { color: var(--terminal-red); }
       }
     }
   });
-  $("run").addEventListener("click", execute);
-  $("submit").addEventListener("click", execute);
+  $("run").addEventListener("click", function () { execute(false); });
+  $("submit").addEventListener("click", function () {
+    if (!state.problem || !Array.isArray(state.problem.tests) || state.problem.tests.length === 0) {
+      setStatus("Este ejercicio no tiene tests de envío configurados", "bad");
+      $("result").textContent = "No se puede evaluar una solución sin casos de prueba. Abre un reto generado con tests definidos por ChatGPT.";
+      $("result").className = "bad";
+      return;
+    }
+    execute(true);
+  });
   $("reset").addEventListener("click", function () {
     $("code").value = state.initialCode || templateFor(languageName());
     setLineNumbers();
