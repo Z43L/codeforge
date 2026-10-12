@@ -132,29 +132,48 @@ function createCodeForgeServer() {
 
   registerAppTool(server, "submit_code", {
     title: "Run CodeForge code",
-    description: "Execute a user's code through the CodeForge Judge0 backend. Use the exact language ID from the supported languages list.",
+    description: "Run code through Judge0. Run mode executes the provided stdin only. Submit mode executes every supplied test case against its expected output and aggregates the verdict; Accepted only if every test passes.",
     inputSchema: {
       problemId: z.string().min(1),
       languageId: z.number().int().positive(),
       language: z.string().min(1),
       sourceCode: z.string().min(1).max(100000),
       stdin: z.string().max(50000).optional(),
-      expectedOutput: z.string().max(50000).optional()
+      expectedOutput: z.string().max(50000).optional(),
+      testCases: z.array(z.object({ name: z.string(), stdin: z.string().max(50000), expectedOutput: z.string().max(50000) })).max(20).optional()
     },
     outputSchema: { submission: z.any() },
     _meta: {}
   }, async (args) => {
-    const submission = await api("/api/submissions", {
+    const runOne = async (stdin, expectedOutput) => api("/api/submissions", {
       method: "POST",
       body: JSON.stringify({
         problemId: args.problemId,
         languageId: args.languageId,
         language: args.language,
         sourceCode: args.sourceCode,
-        stdin: args.stdin || "",
-        expectedOutput: args.expectedOutput || ""
+        stdin: stdin || "",
+        expectedOutput: expectedOutput || ""
       })
     });
+    if (args.testCases && args.testCases.length) {
+      const results = [];
+      for (const test of args.testCases) {
+        const result = await runOne(test.stdin, test.expectedOutput);
+        results.push({ name: test.name, expectedOutput: test.expectedOutput, ...result, passed: result.verdict === "Accepted" });
+        if (result.verdict === "Compilation Error" || result.verdict === "Execution Error") break;
+      }
+      const passed = results.filter((test) => test.passed).length;
+      const submission = {
+        verdict: passed === args.testCases.length ? "Accepted" : (results.some((test) => test.verdict === "Compilation Error") ? "Compilation Error" : "Wrong Answer"),
+        passedTests: passed, totalTests: args.testCases.length, tests: results,
+        stdout: results.length === 1 ? results[0].stdout : "",
+        stderr: results.find((test) => test.stderr)?.stderr || "",
+        compileOutput: results.find((test) => test.compileOutput)?.compileOutput || ""
+      };
+      return reply("Submission result: " + passed + "/" + args.testCases.length + " tests passed. Verdict: " + submission.verdict, { submission });
+    }
+    const submission = await runOne(args.stdin || "", args.expectedOutput || "");
     return reply("Execution finished with verdict: " + (submission.verdict || "Unknown"), { submission });
   });
 
