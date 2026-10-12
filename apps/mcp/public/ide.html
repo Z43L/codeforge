@@ -421,11 +421,12 @@ pre#result.bad { color: var(--terminal-red); }
     new MutationObserver(syncColorScheme).observe(document.body, { attributes: true, attributeFilter: ["class", "style"] });
   }
 
-  /* Make the editor immediately editable even before the MCP host completes initialization. */
+  /* Start in a neutral workspace; only load exercise-specific content when ChatGPT explicitly requests a challenge. */
   state.problem = {
-    id: "two-sum",
-    title: "Pair With Target",
-    sampleInput: defaults["two-sum"],
+    id: "custom",
+    title: "Custom workspace",
+    sampleInput: "",
+    sampleOutput: "",
     starterCode: {}
   };
   state.activeLanguage = fallbackLanguages[0];
